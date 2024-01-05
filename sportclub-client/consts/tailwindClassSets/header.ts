@@ -1,0 +1,1 @@
+export const activeLinkClassName = 'underline text-sky-600 font-semibold';

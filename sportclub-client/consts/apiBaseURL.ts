@@ -1,0 +1,1 @@
+export const apiBaseURL = 'https://sport-club-app-server.onrender.com/api';

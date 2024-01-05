@@ -1,0 +1,101 @@
+'use client'
+import React, {FormEvent, useEffect, useRef, useState} from 'react';
+import {userDto} from "@/types/dto/userDto";
+import {putUser} from "@/app/api/user/putUser";
+
+function Profile(props: { userData: userDto, access_token: string }) {
+    const firstNameRef = useRef<HTMLInputElement | null>(null);
+    const lastNameRef = useRef<HTMLInputElement | null>(null);
+    const emailRef = useRef<HTMLInputElement | null>(null);
+    const phoneRef = useRef<HTMLInputElement | null>(null);
+    const birthdayRef = useRef<HTMLInputElement | null>(null);
+    const [bonuses, setBonuses] = useState<number>(props.userData.bonuses);
+    const bonusesRef = useRef<HTMLInputElement | null>(null);
+
+    useEffect(()=>{
+        setBonuses(props.userData.bonuses)
+    },[props.userData.bonuses])
+
+    async function onSubmit(e: FormEvent) {
+        e.preventDefault();
+        const userDataToUpdate = {
+            firstName: firstNameRef.current?.value,
+            lastName: lastNameRef.current?.value,
+            email: emailRef.current?.value,
+            phone: phoneRef.current?.value,
+            birthday: birthdayRef.current?.value,
+            bonuses: bonusesRef.current?.value
+        }
+        await putUser(props.userData.id, props.access_token, userDataToUpdate)
+            .then(() => alert("User data was successfully updated."))
+    }
+
+
+    return (
+        <div>
+            <p className='text-2xl font-bold underline mb-2 text-sky-600'>Personal data</p>
+            {props.userData &&
+
+                <form onSubmit={onSubmit} className="flex flex-col">
+                    <div className='flex items-center gap-4 mb-2'>
+                        <label htmlFor="firstName" className='w-20'>First Name</label>
+                        <input type="text" id="firstName" name="firstName" required
+                               defaultValue={props.userData.firstName}
+                               ref={firstNameRef}
+                               minLength={2}
+                               className="h-10 focus:outline-none p-1 border-black border-b-2"/>
+                    </div>
+                    <div className='flex items-center gap-4 mb-2'>
+                        <label htmlFor="firstName" className='w-20'>Last Name</label>
+                        <input type="text" id="firstName" name="firstName" required
+                               defaultValue={props.userData.lastName}
+                               ref={lastNameRef}
+                               minLength={2}
+                               className="focus:outline-none p-1 border-black border-b-2 mb-2"/>
+                    </div>
+                    <div className='flex items-center gap-4 mb-2'>
+                        <label htmlFor="email" className='w-20'>Email</label>
+                        <input type="email" id="email" name="email" required
+                               value={props.userData.email} readOnly
+                               ref={emailRef}
+                               pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
+                               title="Example: name@gmail.com"
+                               className="focus:outline-none p-1 border-black border-b-2 mb-2"/>
+                    </div>
+                    <div className='flex items-center gap-4 mb-2'>
+                        <label htmlFor="phone" className='w-20'>Phone</label>
+                        <input type="tel" id="phone" name="phone" required
+                               defaultValue={props.userData.phone} readOnly
+                               ref={phoneRef}
+                               className="focus:outline-none p-1 border-black border-b-2 mb-2"/>
+                    </div>
+                    <div className='flex items-center gap-4 mb-2'>
+                        <label htmlFor="birthday" className='w-20'>Birthday</label>
+                        <input type="date" id="phone" name="phone" required
+                               defaultValue={props.userData.birthday.substring(0, 10)}
+                               ref={birthdayRef}
+                               className="focus:outline-none p-1 border-black border-b-2 mb-2"/>
+                    </div>
+                    <div className='flex items-center gap-4 mb-2'>
+                        <label htmlFor="bonuses" className='w-20'>Bonuses</label>
+                        <input type="number" id="bonuses" name="bonuses" required
+                               value={bonuses}
+                               ref={bonusesRef}
+                               onChange={(e) => {
+                                    setBonuses(parseInt(e.currentTarget.value))
+                                }}
+                               className="focus:outline-none p-1 border-black border-b-2 mb-2"/>
+                    </div>
+                    <div className='flex gap-4'>
+                        <button type='reset' className="rounded-md bg-slate-300 py-1 text-black text-lg w-20">Reset
+                        </button>
+                        <button type="submit" className="rounded-md bg-cyan-950 py-1 text-white text-lg w-20">Save
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    );
+}
+
+export default Profile;
